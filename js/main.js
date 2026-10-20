@@ -126,12 +126,14 @@ function renderDraw() {
       <p class="small" style="margin-top:12px">국내 추정 개체 수 기준으로 ${SPECIES.length}종 중에서 뽑아요. 개체 수 자료가 없는 동물은 현실 모드에서 빠지고 도감 모드에서만 나와요.</p>
     </section>
 
-    <button class="primary fade" id="draw" data-enter>🎲 태어나기</button>`;
+    <button class="primary fade" id="draw" data-enter>🎲 태어나기</button>
+    <button class="btn ghost fade" id="sources">📚 자료 출처와 가정값 보기</button>`;
 
   app.querySelectorAll("[data-mode]").forEach((b) =>
     b.addEventListener("click", () => { mode = b.dataset.mode; renderDraw(); })
   );
   document.getElementById("draw").addEventListener("click", rollAnimation);
+  document.getElementById("sources").addEventListener("click", renderSources);
   window.scrollTo(0, 0);
 }
 
@@ -231,7 +233,7 @@ function renderVariantBirth(species, probability) {
     ${birthHero(life.emoji, variant.name, probability * vp, variant.desc)}
     ${stepsCard(steps)}
     <button class="primary fade" id="start" data-enter>삶 시작하기</button>`;
-  document.getElementById("start").addEventListener("click", () => startGame(variant.life, { species }));
+  document.getElementById("start").addEventListener("click", () => startGame(variant.life, { species, variant }));
   window.scrollTo(0, 0);
 }
 
@@ -423,6 +425,8 @@ function renderEnd() {
       ${worldNotes.map((t) => `<p>${t}</p>`).join("")}
     </section>
 
+    ${sourcesCard(state)}
+
     <section class="card action fade">
       <div class="card-head"><span class="icon">🤝</span><h2>이 동물을 위해 우리가 할 수 있는 일</h2></div>
       <p>${a.action}</p>
@@ -437,6 +441,76 @@ function renderEnd() {
   document.getElementById("again").addEventListener("click", rollAnimation);
   document.getElementById("same").addEventListener("click", () => startGame(state.lifeId, state.origin));
   document.getElementById("home").addEventListener("click", renderDraw);
+  window.scrollTo(0, 0);
+}
+
+// ---------- 출처와 가정값 ----------
+// 확인된 통계인지, 추정·가정값인지 표시
+function vBadge(ok) {
+  return ok ? '<span class="vbadge ok">확인된 통계</span>' : '<span class="vbadge guess">추정·가정값</span>';
+}
+const looksAssumed = (text) => /가정|확인 필요|추정/.test(text);
+
+function linkList(links) {
+  return `<ul class="links">${links.map((l) =>
+    `<li><span class="kind ${l.kind}">${l.kind}</span><a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a></li>`).join("")}</ul>`;
+}
+
+const ASSUMED_RULE = "선택지마다의 위험도와 결과 확률은 게임을 위해 정한 값이에요. 사건과 결과 문구 속 사실과 숫자만 아래 자료에 근거해요.";
+
+function sourcesCard(state) {
+  const { species, antSpecies, variant } = state.origin;
+  const src = SOURCES[species.id] || { calibration: "", links: [] };
+  const a = state.animal;
+  const sub = antSpecies ? antSpecies.popNote : variant && window[species.variants].length > 1 ? variant.popNote : "";
+  return `
+    <section class="card sources fade">
+      <div class="card-head"><span class="icon">📚</span><h2>이 삶의 숫자는 어디서 왔나요?</h2></div>
+      <dl class="facts">
+        <div><dt>태어날 확률</dt><dd>${species.popSource} ${vBadge(species.verified)}</dd></div>
+        ${sub ? `<div><dt>${antSpecies ? antSpecies.name : variant.name}일 확률</dt><dd>${sub} ${vBadge(!looksAssumed(sub))}</dd></div>` : ""}
+        <div><dt>자연 수명</dt><dd>${a.lifespan.label}. ${a.lifespan.note} ${vBadge(a.lifespan.verified)}</dd></div>
+        ${src.calibration ? `<div><dt>실제 기록에 맞춘 부분</dt><dd>${src.calibration}</dd></div>` : ""}
+        <div><dt>게임용 가정값</dt><dd>${ASSUMED_RULE}</dd></div>
+      </dl>
+      ${src.links.length ? linkList(src.links) : ""}
+    </section>`;
+}
+
+// 첫 화면에서 여는 전체 출처 페이지
+function renderSources() {
+  setTheme(null);
+  const list = SPECIES.slice().sort((a, b) => a.group.localeCompare(b.group, "ko") || a.name.localeCompare(b.name, "ko"));
+  app.innerHTML = `
+    <header class="hero fade">
+      <h1 class="display" style="font-size:2rem">자료 출처와 가정값</h1>
+      <p class="sub">이 게임의 숫자가 어디서 왔는지, 무엇이 확인된 통계이고 무엇이 가정인지 밝혀 둬요.</p>
+    </header>
+    <section class="card fade">
+      <div class="card-head"><span class="icon">🧭</span><h2>읽는 법</h2></div>
+      <dl class="facts">
+        <div><dt>${vBadge(true)}</dt><dd>정부 통계, 공식 조사, 논문 등에서 확인한 숫자예요.</dd></div>
+        <div><dt>${vBadge(false)}</dt><dd>자료가 없거나 부족해서 계산하거나 가정한 숫자예요. 더 좋은 자료를 찾으면 바꿀 거예요.</dd></div>
+        <div><dt>게임용 가정값</dt><dd>${ASSUMED_RULE}</dd></div>
+        <div><dt>자료 없음</dt><dd>국내 개체 수 자료가 없는 동물은 현실 모드 뽑기에서 빠지고 도감 모드에서만 나와요.</dd></div>
+      </dl>
+    </section>
+    ${list.map((sp) => {
+      const src = SOURCES[sp.id] || { calibration: "", links: [] };
+      return `
+        <details class="card src-item fade">
+          <summary><span class="em">${sp.emoji}</span><b>${sp.name}</b><span class="chip plain">${sp.group}</span>
+            ${sp.population ? vBadge(sp.verified) : '<span class="vbadge none">자료 없음</span>'}</summary>
+          <dl class="facts">
+            <div><dt>국내 개체 수</dt><dd>${sp.popSource}</dd></div>
+            ${src.calibration ? `<div><dt>실제 기록에 맞춘 부분</dt><dd>${src.calibration}</dd></div>` : ""}
+          </dl>
+          ${src.links.length ? linkList(src.links) : ""}
+        </details>`;
+    }).join("")}
+    <p class="small fade" style="margin:6px 4px 14px">더 자세한 정리와 확인이 필요한 항목 목록은 기획 문서에 있어요.</p>
+    <button class="primary fade" id="back" data-enter>← 처음으로</button>`;
+  document.getElementById("back").addEventListener("click", renderDraw);
   window.scrollTo(0, 0);
 }
 

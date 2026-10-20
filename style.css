@@ -335,7 +335,35 @@ details.more[open] summary .closed, details.more:not([open]) summary .opened { d
 .action { border: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); background: var(--accent-soft); }
 .action h2 { color: var(--accent); }
 
+/* ---------- 출처와 가정값 ---------- */
+.btn.ghost { width: 100%; margin-top: 10px; background: transparent; color: var(--muted); font-weight: 600; }
+.btn.ghost:hover { color: var(--accent); }
+.vbadge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; vertical-align: 1px; white-space: nowrap; }
+.vbadge.ok { background: var(--nature-bg); color: var(--nature); }
+.vbadge.guess { background: #f6ead0; color: #8a6414; }
+.vbadge.none { background: var(--card-2); color: var(--muted); }
+@media (prefers-color-scheme: dark) { .vbadge.guess { background: #43381f; color: #e6c477; } }
+.facts { margin: 0; display: grid; gap: 10px; }
+.facts div { display: grid; grid-template-columns: 112px 1fr; gap: 10px; font-size: 0.88rem; }
+.facts dt { font-weight: 700; color: var(--muted); }
+.facts dd { margin: 0; }
+.links { list-style: none; margin: 14px 0 0; padding: 12px 0 0; border-top: 1px dashed var(--line); display: grid; gap: 8px; }
+.links li { display: flex; gap: 8px; align-items: baseline; font-size: 0.86rem; }
+.links a { color: var(--ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-underline-offset: 3px; }
+.links a:hover { color: var(--accent); }
+.kind { flex: none; font-size: 0.68rem; font-weight: 700; padding: 1px 7px; border-radius: 6px; background: var(--card-2); color: var(--muted); }
+.kind.통계 { background: var(--nature-bg); color: var(--nature); }
+.kind.연구 { background: #e2e8f6; color: #3f5a9a; }
+@media (prefers-color-scheme: dark) { .kind.연구 { background: #262f45; color: #a9bbe8; } }
+.src-item { padding: 14px 18px; }
+.src-item summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.src-item summary::-webkit-details-marker { display: none; }
+.src-item summary .em { font-size: 1.4rem; }
+.src-item summary .vbadge { margin-left: auto; }
+.src-item[open] summary { margin-bottom: 12px; }
+
 @media (max-width: 420px) {
+  .facts div { grid-template-columns: 1fr; gap: 2px; }
   .hero h1 { font-size: 2.2rem; }
   .tiles { gap: 8px; }
   .tile .num { font-size: 1.3rem; }

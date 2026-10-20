@@ -29,7 +29,7 @@ for (const s of ctx.SPECIES) {
     : s.variants ? ctx[s.variants].map((v) => v.life)
     : [s.id];
   for (const l of lives) if (!ctx.ANIMALS[l]) fail(`${s.id}: 삶 "${l}"이 없음`);
-  if (ctx.SOURCES && !ctx.SOURCES[s.id]) fail(`${s.id}: data/sources.js에 출처가 없음`);
+  if (!ctx.SOURCES || !ctx.SOURCES[s.id]) fail(`${s.id}: data/sources.js에 출처가 없음`);
 }
 
 // ---------- 2. 경로 ----------
@@ -54,7 +54,7 @@ try {
     for (const m of ["real", "dex"]) {
       mode = m;
       renderDraw(); check("뽑기 화면 " + m);
-      if (typeof renderSources === "function") { renderSources(); check("출처 화면 " + m); }
+      renderSources(); check("출처 화면 " + m);
       for (const sp of SPECIES) { renderBirth({ species: sp, probability: animalProbability(sp) }); check("탄생 " + sp.id); }
     }
     for (const id of Object.keys(ANIMALS)) {
