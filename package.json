@@ -1,0 +1,9 @@
+{
+  "name": "born-as-an-animal",
+  "private": true,
+  "description": "동물로 태어나기 - 한국에서 동물로 태어난 삶을 실제 통계로 체험하는 웹 게임",
+  "scripts": {
+    "test": "node tests/check.js",
+    "balance": "node tests/balance.js"
+  }
+}
