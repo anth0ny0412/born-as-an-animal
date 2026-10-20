@@ -20,6 +20,7 @@ window.SOURCES = {
       { kind: "보도", label: "2022년 겨울 꿀벌 39만 봉군·78억 마리 폐사 (더나은미래)", url: "https://futurechosun.com/archives/65049" },
       { kind: "보도", label: "꿀벌 집단 실종 원인과 피해 (서울신문 2022)", url: "https://m.go.seoul.co.kr/news/2022/11/30/20221130011001" },
       { kind: "보도", label: "꿀벌 실종 정리 (그린피스)", url: "https://www.greenpeace.org/korea/update/25543/blog-ce-honeybee-disappearance-101/" },
+      { kind: "연구", label: "봉군당 일벌 수: 겨울 1만~1.5만, 한여름 5만~6만 (오리건주립대 등 확장 교육 자료)", url: "https://pollinators.msu.edu/sites/_pollinators/assets/File/pnw623.pdf" },
     ],
   },
   fish: {

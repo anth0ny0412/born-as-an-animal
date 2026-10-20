@@ -127,13 +127,17 @@ function renderDraw() {
     </section>
 
     <button class="primary fade" id="draw" data-enter>🎲 태어나기</button>
-    <button class="btn ghost fade" id="sources">📚 자료 출처와 가정값 보기</button>`;
+    <div class="btn-row fade">
+      <button class="btn" id="dex">📖 도감 ${allLives().filter((l) => loadDex()[l.lifeId]).length}/${allLives().length}</button>
+      <button class="btn" id="sources">📚 자료 출처</button>
+    </div>`;
 
   app.querySelectorAll("[data-mode]").forEach((b) =>
     b.addEventListener("click", () => { mode = b.dataset.mode; renderDraw(); })
   );
   document.getElementById("draw").addEventListener("click", rollAnimation);
   document.getElementById("sources").addEventListener("click", renderSources);
+  document.getElementById("dex").addEventListener("click", renderDex);
   window.scrollTo(0, 0);
 }
 
@@ -365,6 +369,12 @@ function renderEnd() {
   const causeLine = state.alive
     ? `<p class="cause">${endText(state)}</p>`
     : `<p class="cause">${state.death.text}</p><p style="margin-top:8px">${tagBadge(state.death.tag)}</p>`;
+  const { isNew, dex } = recordLife(state);
+  const dexTotal = allLives().length;
+  const dexGot = allLives().filter((l) => dex[l.lifeId]).length;
+  const dexBanner = isNew
+    ? `<section class="card notice fade"><span class="icon">📖</span><div><b>도감에 새로 등록됐어요!</b><p class="small">${dexGot} / ${dexTotal}개의 삶을 살아 봤어요.</p></div></section>`
+    : "";
   const worldNotes = [state.origin.species.world.note, state.origin.antSpecies && state.origin.antSpecies.worldNote].filter(Boolean);
 
   app.innerHTML = `
@@ -373,6 +383,7 @@ function renderEnd() {
       <h2 class="display">${headline}</h2>
       ${causeLine}
     </section>
+    ${dexBanner}
 
     <div class="tiles fade">
       <div class="tile"><div class="num">${state.weeksLived.toLocaleString()}<small>${u}</small></div><div class="lbl">내가 산 기간</div></div>
@@ -435,12 +446,104 @@ function renderEnd() {
     <button class="primary fade" id="again" data-enter>🎲 다시 태어나기</button>
     <div class="btn-row fade">
       <button class="btn" id="same">🔁 같은 동물로 다시 살기</button>
-      <button class="btn" id="home">🏠 처음으로</button>
+      <button class="btn" id="home">📖 도감 보기</button>
     </div>`;
 
   document.getElementById("again").addEventListener("click", rollAnimation);
   document.getElementById("same").addEventListener("click", () => startGame(state.lifeId, state.origin));
-  document.getElementById("home").addEventListener("click", renderDraw);
+  document.getElementById("home").addEventListener("click", renderDex);
+  window.scrollTo(0, 0);
+}
+
+// ---------- 도감 ----------
+// 살아 본 삶의 기록. 이 브라우저에만 저장되고, 저장이 막혀 있으면 기록 없이 게임만 돌아감
+const DEX_KEY = "born-as-an-animal.dex.v1";
+function loadDex() {
+  try { return JSON.parse(localStorage.getItem(DEX_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveDex(dex) {
+  try { localStorage.setItem(DEX_KEY, JSON.stringify(dex)); } catch (e) { /* 저장 불가 환경 */ }
+}
+
+// 도감에 들어갈 모든 삶 (뽑기와 같은 순서·갈래)
+function allLives() {
+  const lives = [];
+  for (const species of SPECIES) {
+    if (species.antSpecies) {
+      for (const antSpecies of ANT_SPECIES)
+        for (const c of antSpecies.castes) lives.push({ lifeId: c.life, species, origin: { species, antSpecies } });
+    } else if (species.variants) {
+      for (const variant of window[species.variants]) lives.push({ lifeId: variant.life, species, origin: { species, variant } });
+    } else {
+      lives.push({ lifeId: species.id, species, origin: { species } });
+    }
+  }
+  return lives;
+}
+
+// 결과 화면에 들어올 때 한 번 기록. 새로 등록됐는지 돌려줌
+function recordLife(state) {
+  const dex = loadDex();
+  const prev = dex[state.lifeId];
+  dex[state.lifeId] = {
+    count: (prev ? prev.count : 0) + 1,
+    best: Math.max(prev ? prev.best : 0, state.weeksLived),
+    survived: (prev && prev.survived) || state.alive,
+  };
+  saveDex(dex);
+  return { isNew: !prev, dex };
+}
+
+function renderDex() {
+  setTheme(null);
+  const dex = loadDex();
+  const lives = allLives();
+  const got = lives.filter((l) => dex[l.lifeId]).length;
+  const groups = [...new Set(SPECIES.map((s) => s.group))];
+  let armed = false;
+
+  app.innerHTML = `
+    <header class="hero fade">
+      <h1 class="display" style="font-size:2rem">📖 나의 도감</h1>
+      <p class="sub">살아 본 삶이 하나씩 채워져요.</p>
+    </header>
+    <section class="card fade">
+      <div class="dex-progress"><b>${got}</b> / ${lives.length}개의 삶</div>
+      <div class="track"><div class="fill" style="width:${(got / lives.length) * 100}%"></div></div>
+      <p class="small" style="margin-top:8px">기록은 이 브라우저에만 저장돼요. 살아 본 삶을 누르면 그 삶을 다시 살 수 있어요.</p>
+    </section>
+    ${groups.map((g) => `
+      <section class="card fade" data-dex-group="${GROUP_THEME[g] || ""}">
+        <div class="card-head"><h2>${g}</h2></div>
+        <div class="dex-grid">
+          ${lives.filter((l) => l.species.group === g).map((l) => {
+            const rec = dex[l.lifeId];
+            const life = ANIMALS[l.lifeId];
+            if (!rec) return `<div class="dex-card locked"><span class="em">❔</span><b>???</b><span class="small">${l.species.name}</span></div>`;
+            return `
+              <button class="dex-card" data-life="${l.lifeId}">
+                <span class="em">${life.emoji}</span><b>${life.name}</b>
+                <span class="small">${rec.count}번 · 최고 ${rec.best.toLocaleString()}${unit(life)}${rec.survived ? " · 🌟" : ""}</span>
+              </button>`;
+          }).join("")}
+        </div>
+      </section>`).join("")}
+    <p class="small fade" style="margin:0 4px 14px">🌟 끝까지 살아남은 적이 있는 삶</p>
+    <button class="primary fade" id="back" data-enter>← 처음으로</button>
+    ${got ? `<button class="btn ghost fade" id="reset">도감 기록 지우기</button>` : ""}`;
+
+  app.querySelectorAll("[data-life]").forEach((b) => b.addEventListener("click", () => {
+    const l = lives.find((x) => x.lifeId === b.dataset.life);
+    startGame(l.lifeId, l.origin);
+  }));
+  document.getElementById("back").addEventListener("click", renderDraw);
+  const reset = document.getElementById("reset");
+  // 확인 창 대신 두 번 눌러야 지워지게 함
+  if (reset) reset.addEventListener("click", () => {
+    if (!armed) { armed = true; reset.textContent = "정말 지울까요? 한 번 더 누르면 지워져요"; return; }
+    saveDex({});
+    renderDex();
+  });
   window.scrollTo(0, 0);
 }
 

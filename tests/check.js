@@ -55,6 +55,7 @@ try {
       mode = m;
       renderDraw(); check("뽑기 화면 " + m);
       renderSources(); check("출처 화면 " + m);
+      renderDex(); check("도감 화면 " + m);
       for (const sp of SPECIES) { renderBirth({ species: sp, probability: animalProbability(sp) }); check("탄생 " + sp.id); }
     }
     for (const id of Object.keys(ANIMALS)) {
