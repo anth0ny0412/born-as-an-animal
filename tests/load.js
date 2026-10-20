@@ -16,7 +16,7 @@ function load({ withUI = false } = {}) {
   const app = Object.assign(el(), { querySelectorAll: () => [], querySelector: () => null });
   const ctx = {
     console,
-    setTimeout() {}, setInterval: () => 0, clearInterval() {}, scrollTo() {},
+    setTimeout() {}, clearTimeout() {}, setInterval: () => 0, clearInterval() {}, scrollTo() {},
     document: { getElementById: (id) => (id === "app" ? app : el()), addEventListener() {}, body: {} },
   };
   ctx.window = ctx;

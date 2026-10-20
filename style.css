@@ -362,6 +362,27 @@ details.more[open] summary .closed, details.more:not([open]) summary .opened { d
 .src-item summary .vbadge { margin-left: auto; }
 .src-item[open] summary { margin-bottom: 12px; }
 
+/* ---------- 자동 진행 ---------- */
+.auto-ctl {
+  position: fixed; right: 16px; bottom: 16px; z-index: 20; display: flex; gap: 4px;
+  background: color-mix(in srgb, var(--card) 90%, transparent); backdrop-filter: blur(8px);
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px; box-shadow: var(--shadow);
+}
+.auto-ctl button { border: 0; background: transparent; border-radius: 999px; padding: 8px 14px; font-size: 0.86rem; font-weight: 700; color: var(--muted); }
+.auto-ctl button:hover { color: var(--ink); background: var(--card-2); }
+.auto-ctl.on .auto-toggle { background: #3d7a4c; color: #fff; }
+.auto-ctl.on .auto-speed { color: var(--ink); }
+/* 다음으로 넘어가기까지 남은 시간 */
+.counting { position: relative; overflow: hidden; }
+.counting::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 4px; width: 100%;
+  background: var(--accent); transform-origin: left; animation: countdown var(--dur, 3s) linear forwards;
+}
+.primary.counting::after { background: rgba(255, 255, 255, 0.75); }
+@keyframes countdown { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.choice.auto-pick { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+.choice.auto-pick .num { background: var(--accent); color: var(--accent-ink); }
+
 /* ---------- 도감 ---------- */
 .dex-progress { font-size: 0.95rem; margin-bottom: 8px; }
 .dex-progress b { font-size: 1.6rem; color: var(--accent); }

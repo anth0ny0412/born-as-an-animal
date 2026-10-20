@@ -138,12 +138,14 @@ function renderDraw() {
   document.getElementById("draw").addEventListener("click", rollAnimation);
   document.getElementById("sources").addEventListener("click", renderSources);
   document.getElementById("dex").addEventListener("click", renderDex);
+  Auto.plan("draw");
   window.scrollTo(0, 0);
 }
 
 // 슬롯머신처럼 점점 느려지다 멈춤
 function rollAnimation() {
   const result = Engine.drawSpecies(SPECIES, mode, rng);
+  Auto.plan("none");
   app.innerHTML = `
     <div class="card slot fade">
       <div class="slot-window" id="roll" aria-live="polite">❔</div>
@@ -200,6 +202,7 @@ function renderBirth({ species, probability }) {
     ${stepsCard([{ title: `동물 중 ${species.name}`, p: probability, note: animalNote(species) }])}
     <button class="primary fade" id="start" data-enter>삶 시작하기</button>`;
   document.getElementById("start").addEventListener("click", () => startGame(species.id, { species }));
+  Auto.plan("birth", { text: species.popSource });
   window.scrollTo(0, 0);
 }
 
@@ -222,6 +225,7 @@ function renderAntBirth(species, probability) {
     ])}
     <button class="primary fade" id="start" data-enter>삶 시작하기</button>`;
   document.getElementById("start").addEventListener("click", () => startGame(a.caste.life, { species, antSpecies: a.antSpecies }));
+  Auto.plan("birth", { text: a.antSpecies.desc });
   window.scrollTo(0, 0);
 }
 
@@ -238,6 +242,7 @@ function renderVariantBirth(species, probability) {
     ${stepsCard(steps)}
     <button class="primary fade" id="start" data-enter>삶 시작하기</button>`;
   document.getElementById("start").addEventListener("click", () => startGame(variant.life, { species, variant }));
+  Auto.plan("birth", { text: variant.desc });
   window.scrollTo(0, 0);
 }
 
@@ -256,6 +261,7 @@ function startGame(lifeId, origin) {
     <section class="card fade"><p class="story">${state.animal.intro}</p></section>
     <button class="primary fade" id="go" data-enter>눈을 뜬다</button>`;
   document.getElementById("go").addEventListener("click", renderTurn);
+  Auto.plan("intro", { text: state.animal.intro });
   window.scrollTo(0, 0);
 }
 
@@ -312,6 +318,7 @@ function renderTurn() {
       renderOutcome(ev);
     })
   );
+  Auto.plan("turn", { text: event.text });
 }
 
 function renderOutcome(ev) {
@@ -342,6 +349,7 @@ function renderOutcome(ev) {
     <button class="primary fade" id="next" data-enter>${next}</button>`;
 
   document.getElementById("next").addEventListener("click", () => (state.finished ? renderEnd() : renderTurn()));
+  Auto.plan("outcome", { text: entry.result + extra });
 }
 
 // ---------- 4. 결과 화면 ----------
@@ -369,7 +377,8 @@ function renderEnd() {
   const causeLine = state.alive
     ? `<p class="cause">${endText(state)}</p>`
     : `<p class="cause">${state.death.text}</p><p style="margin-top:8px">${tagBadge(state.death.tag)}</p>`;
-  const { isNew, dex } = recordLife(state);
+  // 자동 진행으로 산 삶은 도감에 기록하지 않음 (내가 직접 살아 본 삶만)
+  const { isNew, dex } = Auto.isOn() ? { isNew: false, dex: loadDex() } : recordLife(state);
   const dexTotal = allLives().length;
   const dexGot = allLives().filter((l) => dex[l.lifeId]).length;
   const dexBanner = isNew
@@ -456,6 +465,7 @@ function renderEnd() {
     </div>`;
 
   document.getElementById("again").addEventListener("click", rollAnimation);
+  Auto.plan("end");
   document.getElementById("same").addEventListener("click", () => startGame(state.lifeId, state.origin));
   document.getElementById("home").addEventListener("click", renderDex);
   window.scrollTo(0, 0);
@@ -543,6 +553,7 @@ function renderDex() {
     startGame(l.lifeId, l.origin);
   }));
   document.getElementById("back").addEventListener("click", renderDraw);
+  Auto.plan("none");
   const reset = document.getElementById("reset");
   // 확인 창 대신 두 번 눌러야 지워지게 함
   if (reset) reset.addEventListener("click", () => {
@@ -620,6 +631,7 @@ function renderSources() {
     <p class="small fade" style="margin:6px 4px 14px">더 자세한 정리와 확인이 필요한 항목 목록은 기획 문서에 있어요.</p>
     <button class="primary fade" id="back" data-enter>← 처음으로</button>`;
   document.getElementById("back").addEventListener("click", renderDraw);
+  Auto.plan("none");
   window.scrollTo(0, 0);
 }
 
