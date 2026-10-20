@@ -436,6 +436,12 @@ function renderEnd() {
       ${worldNotes.map((t) => `<p>${t}</p>`).join("")}
     </section>
 
+    ${state.origin.species.realityNote ? `
+    <section class="card fade">
+      <div class="card-head"><span class="icon">🔎</span><h2>게임에 담지 않은 현실</h2></div>
+      <p>${state.origin.species.realityNote}</p>
+    </section>` : ""}
+
     ${sourcesCard(state)}
 
     <section class="card action fade">

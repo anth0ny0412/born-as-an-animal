@@ -63,6 +63,8 @@ window.SOURCES = {
       { kind: "보도", label: "반려견 기대수명 12.69세 (미국 1,300만 마리 연구, 데일리벳)", url: "https://www.dailyvet.co.kr/?p=184502" },
       { kind: "보도", label: "번식장·경매장·펫숍 유통 구조 (파이낸셜뉴스)", url: "https://www.fnnews.com/news/202512111834040661" },
       { kind: "보도", label: "관악산·북한산 들개 포획 (헤럴드경제 2026)", url: "https://www.heraldk.com/article/2026030115150026529" },
+      { kind: "통계", label: "개 사육농장 폐업 현황 (농림축산식품부)", url: "https://www.mafra.go.kr/bbs/home/792/576297/artclView.do" },
+      { kind: "보도", label: "폐업 농장 개 97% 도축 출하, 입양 0.15% (2025 국정감사, 데일리벳)", url: "https://www.dailyvet.co.kr/news/policy/260105" },
     ],
   },
   cat: {
