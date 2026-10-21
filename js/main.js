@@ -60,18 +60,25 @@ function setTheme(species) {
 
 // 개체 수 자료가 없는 동물은 현실 모드에서 빠지고 도감 모드에서만 나옴
 function animalProbability(species) {
-  const weightOf = (s) => (mode === "real" ? s.population || 0 : 1);
+  const weightOf = mode === "real" ? Engine.realWeight : () => 1;
   return weightOf(species) / SPECIES.reduce((s, sp) => s + weightOf(sp), 0);
 }
 
-// 확률 막대 길이: 현실 모드는 로그 눈금 (1조 분의 1 ~ 100%)
+// 개체 수 그대로의 비율 (현실 모드는 격차를 줄여 뽑으므로 참고로 함께 보여줌)
+function trueProbability(species) {
+  return (species.population || 0) / SPECIES.reduce((s, sp) => s + (sp.population || 0), 0);
+}
+
+// 확률 막대 길이: 로그 눈금 (0.1% ~ 100%)
 function barWidth(p) {
   if (!p) return 0;
-  return Math.max(3, Math.min(100, ((Math.log10(p) + 12) / 12) * 100));
+  return Math.max(3, Math.min(100, ((Math.log10(p) + 3) / 3) * 100));
 }
 
 function animalNote(species) {
-  return mode === "real" ? species.popSource : "도감 모드라 모든 동물이 같은 확률";
+  return mode === "real"
+    ? `${species.popSource}. 개체 수 그대로라면 ${probabilityText(trueProbability(species))}`
+    : "도감 모드라 모든 동물이 같은 확률";
 }
 
 // ---------- 1. 뽑기 화면 ----------
@@ -110,7 +117,7 @@ function renderDraw() {
 
     <div class="segmented fade" role="tablist">
       <button data-mode="real" class="${mode === "real" ? "on" : ""}" role="tab" aria-selected="${mode === "real"}">
-        <b>현실 모드</b><span>실제 개체 수 비율대로</span></button>
+        <b>현실 모드</b><span>개체 수가 많을수록 잘 나오게</span></button>
       <button data-mode="dex" class="${mode === "dex" ? "on" : ""}" role="tab" aria-selected="${mode === "dex"}">
         <b>도감 모드</b><span>모든 동물이 같은 확률로</span></button>
     </div>
@@ -123,7 +130,7 @@ function renderDraw() {
           <summary><span class="closed">나머지 ${rest.length}종 더 보기 ▾</span><span class="opened">접기 ▴</span></summary>
           <ul class="rank">${rest.map((sp, i) => rankRow(sp, i + 8)).join("")}</ul>
         </details>` : ""}
-      <p class="small" style="margin-top:12px">국내 추정 개체 수 기준으로 ${SPECIES.length}종 중에서 뽑아요. 개체 수 자료가 없는 동물은 현실 모드에서 빠지고 도감 모드에서만 나와요.</p>
+      <p class="small" style="margin-top:12px">국내 추정 개체 수 기준으로 ${SPECIES.length}종 중에서 뽑아요. 개체 수 그대로 뽑으면 개미가 99.5%라서, 많은 순서는 지키되 차이를 줄였어요(개체 수의 0.15제곱). 그래서 멸종위기종은 여전히 드물게 나와요. 개체 수 자료가 없는 동물은 현실 모드에서 빠지고 도감 모드에서만 나와요.</p>
     </section>
 
     <button class="primary fade" id="draw" data-enter>🎲 태어나기</button>
@@ -150,7 +157,7 @@ function rollAnimation() {
     <div class="card slot fade">
       <div class="slot-window" id="roll" aria-live="polite">❔</div>
       <h2 class="display">무엇으로 태어날까…</h2>
-      <p>${mode === "real" ? "실제 개체 수 비율로 뽑는 중" : "모든 동물이 같은 확률로 뽑는 중"}</p>
+      <p>${mode === "real" ? "개체 수가 많은 동물일수록 잘 나와요" : "모든 동물이 같은 확률로 뽑는 중"}</p>
     </div>`;
   const el = document.getElementById("roll");
   const pool = SPECIES.map((s) => s.emoji);

@@ -339,4 +339,32 @@ window.SPECIES = [
     verified: false, playable: true,
     world: { population: null, note: "코로나19 유행 때 여러 나라에서 햄스터 같은 작은 반려동물을 충동적으로 샀다가 버리는 일이 늘었어요." },
   },
+  {
+    id: "ibis", name: "따오기", emoji: "🦩", group: "멸종위기",
+    population: 200,
+    popSource: "야생 따오기 약 200마리로 가정 (2025년 5월까지 누적 355마리 방사, 2022년 방사 개체 생존율 64.3%), 확인 필요",
+    verified: false, playable: true,
+    world: { population: null, note: "따오기는 한때 동아시아에서 흔했지만 20세기에 거의 사라져, 1981년 중국 산시성에서 7마리만 다시 발견됐어요. 한국과 일본의 따오기는 모두 이 7마리의 자손이에요 (확인 필요)." },
+  },
+  {
+    id: "longhorn", name: "장수하늘소", emoji: "🪲", group: "멸종위기",
+    population: 50,
+    popSource: "야생 개체 수 추정치 없음. 2014~2017년 광릉숲에서 해마다 1마리씩 발견, 2018년부터 인공 증식 개체 방사(2025년 15마리) → 수십 마리로 가정, 확인 필요",
+    verified: false, playable: true,
+    world: { population: null, note: "장수하늘소는 중국·러시아 연해주 등에도 살지만 어디서나 드물어요. 큰 고목이 사라지면서 함께 줄었어요." },
+  },
+  {
+    id: "redbat", name: "붉은박쥐", emoji: "🦇", group: "멸종위기",
+    population: 475,
+    popSource: "국내 붉은박쥐(황금박쥐) 450~500마리 (2017 보도, 게임은 475마리), 최신 조사 확인 필요",
+    verified: false, playable: true,
+    world: { population: null, note: "세계의 박쥐는 1,400종이 넘어, 포유류 다섯 종 중 한 종이 박쥐예요. 북미에서는 흰코증후군이라는 곰팡이 병으로 겨울잠 자던 박쥐 수백만 마리가 죽었어요." },
+  },
+  {
+    id: "suwonfrog", name: "수원청개구리", emoji: "🐸", group: "멸종위기",
+    population: 265,
+    popSource: "2013년 국립생물자원관 전국 조사에서 265마리 확인 (파주·평택·음성 등). 10년 넘은 자료라 최신 조사 확인 필요",
+    verified: true, playable: true,
+    world: { population: null, note: "수원청개구리는 한국에만 사는 고유종이라, 한국의 논에서 사라지면 지구에서 사라져요." },
+  },
 ];

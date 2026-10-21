@@ -260,4 +260,35 @@ window.SOURCES = {
       { kind: "보도", label: "팬데믹 충동 구매와 햄스터 유기 (VICE)", url: "https://vice.com/en/article/pandemic-abandoned-pets-hamster-singapore" },
     ],
   },
+  ibis: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "창녕 따오기 50마리 방사, 누적 355마리 (서울신문 2025)", url: "https://m.go.seoul.co.kr/news/2025/05/07/20250507500206" },
+      { kind: "보도", label: "방사 따오기 160마리 중 103마리 생존, 생존율 64.3% (경향신문 2022)", url: "https://www.khan.co.kr/article/202205031113001" },
+      { kind: "보도", label: "야생 2세대 따오기 부부의 새끼 부화 (한국경제 2026)", url: "https://www.hankyung.com/article/2026062205717" },
+    ],
+  },
+  longhorn: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "장수하늘소 4년 연속 광릉숲 발견 (서울신문 2017)", url: "https://m.go.seoul.co.kr/news/2017/07/25/20170725011012" },
+      { kind: "보도", label: "국립수목원 장수하늘소 인공 사육 10년 (아주경제 2024)", url: "https://www.ajunews.com/view/20240826141153029" },
+      { kind: "보도", label: "광복 80주년 장수하늘소 15마리 방사 (경기일보 2025)", url: "https://www.kyeonggi.com/article/20250803580260" },
+    ],
+  },
+  redbat: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "붉은박쥐 게놈 분석, 국내 450~500마리 (서울신문 2017)", url: "https://m.go.seoul.co.kr/news/2017/07/12/20170712500049" },
+      { kind: "보도", label: "무안 폐광 황금박쥐 121마리 동면 (시대일보 2016)", url: "https://www.sidae.com/article/2016033016508040646" },
+    ],
+  },
+  suwonfrog: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "수원청개구리 전국 265마리 확인 (경기일보 2013)", url: "https://www.kyeonggi.com/article/201303060499822" },
+      { kind: "보도", label: "4월 이달의 멸종위기 야생생물 수원청개구리 (경기일보 2026)", url: "https://www.kyeonggi.com/article/20260402580268" },
+      { kind: "연구", label: "청개구리 합창과 수원청개구리의 울음 위치 (이화여대)", url: "https://dspace.ewha.ac.kr/handle/2015.oak/214233" },
+    ],
+  },
 };

@@ -16,9 +16,14 @@
     return { item, probability: weightOf(item) / total };
   }
 
-  // 현실 모드: 개체 수 비율 (개체 수 자료가 없는 동물은 빠짐), 도감 모드: 모두 같은 확률
+  // 현실 모드: 개체 수의 0.15제곱 비율. 많은 동물이 더 잘 나오는 순서는 지키되,
+  // 그대로 쓰면 개미가 99.5%라 격차를 줄임 (개미 약 34%, 멸종위기종 1% 안팎)
+  // 개체 수 자료가 없는 동물은 빠짐. 도감 모드: 모두 같은 확률
+  const REAL_EXP = 0.15;
+  const realWeight = (s) => (s.population ? Math.pow(s.population, REAL_EXP) : 0);
+
   function drawSpecies(speciesList, mode, rng) {
-    const r = pickWithProbability(speciesList, mode === "real" ? (s) => s.population || 0 : () => 1, rng);
+    const r = pickWithProbability(speciesList, mode === "real" ? realWeight : () => 1, rng);
     return { species: r.item, probability: r.probability };
   }
 
@@ -170,7 +175,7 @@
     return { variant: r.item, probability: r.probability };
   }
 
-  const api = { drawSpecies, drawAnt, drawVariant, stageAt, startLife, nextEvent, choose, humanShare, simulateMany };
+  const api = { realWeight, drawSpecies, drawAnt, drawVariant, stageAt, startLife, nextEvent, choose, humanShare, simulateMany };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.Engine = api;
 })(typeof window !== "undefined" ? window : globalThis);

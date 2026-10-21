@@ -316,6 +316,38 @@
       win: { result: "해파리만 골라 먹었다. 국내에서 발견된 바다거북 폐사체 10마리 중 8마리의 배 속에서 플라스틱이 나왔다.", health: 15 },
       lose: { result: "비닐봉지를 삼켰다. 배 속에 쌓인다.", health: -25 },
     },
+    // ---------- 멸종위기종 확장 ----------
+    {
+      lives: ["ibis"], turns: [4], tag: "사람", type: "whack", title: "우포늪 우렁이 잡기",
+      text: "처음 맞는 야생의 여름. 논물 속에서 우렁이를 찾아 부리로 집어 올리자! 버려진 낚싯바늘은 피할 것.",
+      params: { target: "🐌", decoy: "🪝", need: 7, seconds: 10, showMs: 900 },
+      win: { result: "배불리 먹었다. 위치추적기 신호를 보던 사람들이 안심했다.", health: 15 },
+      lose: { result: "낚싯바늘에 부리를 다쳤다. 버려진 낚시 도구는 물새에게 덫이 된다.", health: -15 },
+    },
+    {
+      lives: ["longhorn"], turns: [1], tag: "자연", type: "mash", title: "단단한 나무 갉기",
+      text: "첫해 겨울이 오기 전에 딱따구리 부리가 닿지 않는 깊이까지 굴을 파야 한다!",
+      params: { icon: "🪵", button: "갉기!", target: 24, seconds: 6 },
+      win: { result: "나무 깊숙이 굴을 팠다. 겨울도 딱따구리도 무섭지 않다.", health: 10 },
+      lose: { outcomes: [
+        { p: 70, result: "굴이 얕다. 딱따구리 소리가 가깝게 들린다.", health: -15 },
+        { p: 30, death: "굴이 얕아 딱따구리 부리에 꺼내졌다." },
+      ] },
+    },
+    {
+      lives: ["redbat"], turns: [1], tag: "자연", type: "whack", title: "초음파로 나방 사냥",
+      text: "첫 비행의 밤. 초음파를 쏘면 메아리로 벌레가 보인다. 나방을 낚아채자!",
+      params: { target: "🦋", decoy: "🦉", need: 7, seconds: 10, showMs: 850 },
+      win: { result: "나방을 잔뜩 잡았다. 겨울잠을 버틸 지방이 쌓이기 시작한다.", health: 15 },
+      lose: { result: "올빼미에게 쫓겨 사냥을 망쳤다.", health: -15 },
+    },
+    {
+      lives: ["suwonfrog"], turns: [3], tag: "자연", type: "timing", title: "합창의 빈틈에 울기",
+      text: "청개구리 수천 마리의 합창이 논을 덮는다. 합창이 잠깐 끊기는 순간에 낮은 소리로 울어야 짝이 듣는다!",
+      params: { icon: "🐸", button: "울기!", zone: [0.42, 0.58], speed: 1.0, label: ["개굴개굴", "빈틈", "개굴개굴"] },
+      win: { result: "합창 사이로 낮은 쇳소리 같은 울음이 퍼졌다. 짝이 다가왔다.", health: 10 },
+      lose: { result: "울음이 청개구리 합창에 묻혔다. 올해는 논둑에서 더 먼 곳으로 밀려났다.", health: -10 },
+    },
   ];
 
   // 각 삶의 사건 목록에 미니게임을 넣음
