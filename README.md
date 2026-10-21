@@ -30,3 +30,8 @@ tests/        검사와 밸런스 확인
 
 - `npm test`: 전체 검사 (데이터 실수, 모든 삶의 경로, 화면 그리기). 빠르게 볼 때는 `RUNS=3000 npm test`
 - `npm run balance`: 삶마다 수명, 생존율, 사람 원인 사망 비율
+
+## 배포
+
+`main`에 push하면 GitHub Pages(https://anth0ny0412.github.io/born-as-an-animal/)에 1~2분 뒤 반영됩니다.
+브라우저가 예전 파일을 쓰지 않도록 `index.html`의 `?v=숫자`를 올린 뒤 push하세요.

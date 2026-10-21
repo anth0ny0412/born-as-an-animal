@@ -7,7 +7,7 @@ const ROOT = path.join(__dirname, "..");
 
 function scriptList() {
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  return [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+  return [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1].split("?")[0]);
 }
 
 // withUI: true면 화면 코드(main.js)까지 가짜 DOM 위에서 실행
