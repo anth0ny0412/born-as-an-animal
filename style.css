@@ -383,6 +383,72 @@ details.more[open] summary .closed, details.more:not([open]) summary .opened { d
 .choice.auto-pick { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
 .choice.auto-pick .num { background: var(--accent); color: var(--accent-ink); }
 
+/* ---------- 미니게임 ---------- */
+.mg .mg-title { margin: 8px 0 6px; font-size: 1.4rem; }
+.mg .primary { margin-top: 14px; }
+.mg-area { position: relative; margin-top: 14px; padding: 16px; border-radius: 14px; background: var(--card-2); border: 1px dashed var(--line); min-height: 90px; }
+.mg-howto { text-align: center; color: var(--muted); }
+.mg-time { height: 6px; background: var(--bar); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+.mg-time .fill { background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: none; }
+.mg-count { text-align: center; font-size: 0.95rem; color: var(--muted); margin: 8px 0; }
+.mg-count b { font-size: 1.4rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.mg-banner {
+  position: absolute; inset: 0; display: grid; place-items: center; border-radius: 14px;
+  font-family: "Jua", sans-serif; font-size: 2.4rem; animation: pop 0.4s both;
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+}
+.mg-banner.win { color: var(--nature); }
+.mg-banner.lose { color: var(--human); }
+
+/* 연타 */
+.mg-mash { display: grid; justify-items: center; gap: 6px; }
+.mg-mash .track { width: 100%; }
+.mash-btn {
+  width: 150px; height: 150px; border-radius: 50%; border: 0; display: grid; place-content: center; gap: 2px;
+  font-weight: 800; font-size: 1rem; color: var(--accent-ink); user-select: none; touch-action: manipulation;
+  background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent));
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--accent) 70%, #000), 0 12px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.mash-btn .em { font-size: 3rem; line-height: 1; }
+.mash-btn:active { transform: translateY(5px); box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 70%, #000); }
+.mash-btn.bump .em { animation: bump 0.15s; }
+@keyframes bump { 50% { transform: scale(1.25); } }
+
+/* 타이밍 */
+.mg-timing { display: grid; gap: 16px; }
+.mg-lane { position: relative; display: flex; height: 64px; border-radius: 12px; overflow: visible; }
+.mg-lane .seg { display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; overflow: hidden; white-space: nowrap; }
+.mg-lane .seg.bad { background: var(--human-bg); color: var(--human); }
+.mg-lane .seg.bad:first-child { border-radius: 12px 0 0 12px; }
+.mg-lane .seg.bad:nth-child(3) { border-radius: 0 12px 12px 0; }
+.mg-lane .seg.good { background: var(--nature-bg); color: var(--nature); box-shadow: inset 0 0 0 2px var(--nature); }
+.mg-lane .marker {
+  position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); font-size: 2.2rem;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25)); pointer-events: none;
+}
+.mg-lane .marker.stop { animation: bump 0.3s; }
+.mg-timing .primary { margin-top: 0; }
+
+/* 사냥 */
+.mg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 300px; margin: 0 auto; }
+.mg-grid .cell {
+  aspect-ratio: 1; border-radius: 14px; border: 1.5px solid var(--line); background: var(--card);
+  font-size: 2.3rem; display: grid; place-items: center; touch-action: manipulation;
+}
+.mg-grid .cell.up { animation: pop 0.25s both; }
+.mg-grid .cell.hit { background: var(--nature-bg); border-color: var(--nature); }
+.mg-grid .cell.miss { background: var(--human-bg); border-color: var(--human); }
+
+/* 따라 하기 */
+.mg-pads { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 280px; margin: 0 auto; }
+.mg-pads .pad {
+  position: relative; aspect-ratio: 1.4; border-radius: 16px; border: 2px solid var(--line); background: var(--card);
+  font-size: 2.2rem; transition: transform 0.1s, background 0.1s, box-shadow 0.1s; touch-action: manipulation;
+}
+.mg-pads .pad small { position: absolute; right: 8px; bottom: 4px; font-size: 0.7rem; color: var(--muted); }
+.mg-pads .pad:disabled { cursor: default; opacity: 0.85; }
+.mg-pads .pad.lit { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.06); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 55%, transparent); }
+
 /* ---------- 도감 ---------- */
 .dex-progress { font-size: 0.95rem; margin-bottom: 8px; }
 .dex-progress b { font-size: 1.6rem; color: var(--accent); }

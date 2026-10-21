@@ -300,6 +300,7 @@ function renderTurn() {
   const stageNotice = prevStage && prevStage.id !== stage.id
     ? `<section class="card notice fade"><span class="icon">🌱</span><div><b>삶이 바뀌었다: ${stage.name}</b><p class="small">${stage.desc}</p></div></section>`
     : "";
+  if (event.minigame) return renderMinigame(event, stageNotice);
 
   app.innerHTML = `
     ${hud()}
@@ -351,6 +352,209 @@ function renderOutcome(ev) {
   document.getElementById("next").addEventListener("click", () => (state.finished ? renderEnd() : renderTurn()));
   Auto.plan("outcome", { text: entry.result + extra });
 }
+
+// ---------- 미니게임 ----------
+// 삶마다 한 번 나오는 미니게임. 성공하면 사건의 첫 번째 선택(성공), 실패하면 두 번째 선택(실패)으로 처리
+const MG_KIND = { mash: "연타", timing: "타이밍", whack: "사냥", simon: "따라 하기" };
+const MG_HOWTO = {
+  mash: (p) => `${p.seconds}초 안에 버튼을 <b>${p.target}번</b> 누르세요. (스페이스바도 돼요)`,
+  timing: () => `움직이는 표시가 <b>초록 구간</b>에 들어왔을 때 버튼을 누르세요. 기회는 한 번! (스페이스바도 돼요)`,
+  whack: (p) => `${p.seconds}초 안에 ${p.target}를 <b>${p.need}번</b> 잡으세요.${p.decoy ? ` ${p.decoy}는 누르면 안 돼요.` : ""} (숫자 키 1~9도 돼요)`,
+  simon: (p) => `반짝이는 순서 <b>${p.length}개</b>를 기억했다가 똑같이 누르세요. (숫자 키 1~4도 돼요)`,
+};
+let mgTimers = [];
+let mgFrame = null;
+let mgKey = null; // 미니게임 중 키보드 처리. 처리했으면 true를 돌려줌
+const mgNow = () => (typeof performance !== "undefined" ? performance.now() : Date.now());
+
+function mgClear() {
+  mgTimers.forEach((t) => { clearTimeout(t); clearInterval(t); });
+  mgTimers = [];
+  if (mgFrame !== null && typeof cancelAnimationFrame === "function") cancelAnimationFrame(mgFrame);
+  mgFrame = null;
+  mgKey = null;
+}
+
+function renderMinigame(event, stageNotice) {
+  const mg = event.minigame;
+  app.innerHTML = `
+    ${hud()}
+    ${stageNotice}
+    <section class="card event mg fade">
+      <span class="chip">🎮 미니게임 · ${MG_KIND[mg.type]}</span>
+      <h2 class="display mg-title">${mg.title}</h2>
+      <p class="event-text">${event.text}</p>
+      <div class="mg-area" id="mg-area"><p class="mg-howto">${MG_HOWTO[mg.type](mg.params)}</p></div>
+      <button class="primary" id="mg-start" data-enter>▶ 시작!</button>
+      <button class="btn ghost" id="mg-skip">건너뛰기 (결과는 운에 맡기기)</button>
+    </section>`;
+
+  const area = document.getElementById("mg-area");
+  let finished = false;
+  const resolve = (success) => {
+    if (finished) return;
+    finished = true;
+    mgClear();
+    const ev = state.current;
+    Engine.choose(state, success ? 0 : 1, rng);
+    renderOutcome(ev);
+  };
+  const done = (success) => {
+    if (finished) return;
+    mgClear();
+    area.insertAdjacentHTML("beforeend", `<div class="mg-banner ${success ? "win" : "lose"}">${success ? "성공!" : "실패…"}</div>`);
+    mgTimers.push(setTimeout(() => resolve(success), 1100));
+  };
+
+  document.getElementById("mg-start").addEventListener("click", (e) => {
+    e.currentTarget.remove();
+    const skip = document.getElementById("mg-skip");
+    if (skip) skip.remove();
+    MG_GAMES[mg.type](area, mg.params, done);
+  });
+  document.getElementById("mg-skip").addEventListener("click", () => resolve(Math.random() < 0.5));
+  Auto.plan("minigame", { text: event.text });
+}
+
+// 남은 시간 막대. 시간이 다 되면 onEnd
+function mgTimer(area, seconds, onEnd) {
+  area.insertAdjacentHTML("afterbegin", `<div class="mg-time"><div class="fill" id="mg-time"></div></div>`);
+  const bar = document.getElementById("mg-time");
+  const start = mgNow();
+  const id = setInterval(() => {
+    const left = Math.max(0, 1 - (mgNow() - start) / (seconds * 1000));
+    bar.style.width = left * 100 + "%";
+    if (left <= 0) onEnd();
+  }, 50);
+  mgTimers.push(id);
+}
+
+const MG_GAMES = {
+  // 연타: 제한 시간 안에 목표 횟수
+  mash(area, p, done) {
+    area.innerHTML = `
+      <div class="mg-mash">
+        <button class="mash-btn" id="mg-mash"><span class="em">${p.icon}</span><span>${p.button}</span></button>
+        <div class="mg-count"><b id="mg-n">0</b> / ${p.target}</div>
+        <div class="track"><div class="fill" id="mg-prog" style="width:0%"></div></div>
+      </div>`;
+    let n = 0;
+    const btn = document.getElementById("mg-mash");
+    const tap = () => {
+      n++;
+      document.getElementById("mg-n").textContent = n;
+      document.getElementById("mg-prog").style.width = Math.min(100, (n / p.target) * 100) + "%";
+      btn.classList.remove("bump"); void btn.offsetWidth; btn.classList.add("bump");
+      if (n >= p.target) done(true);
+    };
+    btn.addEventListener("click", tap);
+    mgKey = (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); if (!e.repeat) tap(); return true; } return false; };
+    mgTimer(area, p.seconds, () => done(false));
+    btn.focus();
+  },
+
+  // 타이밍: 왕복하는 표시가 안전 구간에 있을 때 누르기 (한 번)
+  timing(area, p, done) {
+    const [z0, z1] = p.zone;
+    const labels = p.label || ["", "", ""];
+    area.innerHTML = `
+      <div class="mg-timing">
+        <div class="mg-lane">
+          <div class="seg bad" style="width:${z0 * 100}%"><span>${labels[0]}</span></div>
+          <div class="seg good" style="width:${(z1 - z0) * 100}%"><span>${labels[1]}</span></div>
+          <div class="seg bad" style="width:${(1 - z1) * 100}%"><span>${labels[2]}</span></div>
+          <div class="marker" id="mg-marker">${p.icon}</div>
+        </div>
+        <button class="primary" id="mg-go">${p.button}</button>
+      </div>`;
+    const marker = document.getElementById("mg-marker");
+    const start = mgNow();
+    let pos = 0;
+    const frame = () => {
+      const phase = (((mgNow() - start) / 1000) * p.speed) % 2;
+      pos = phase < 1 ? phase : 2 - phase;
+      marker.style.left = pos * 100 + "%";
+      mgFrame = requestAnimationFrame(frame);
+    };
+    mgFrame = requestAnimationFrame(frame);
+    const go = () => {
+      marker.classList.add("stop");
+      done(pos >= z0 && pos <= z1);
+    };
+    document.getElementById("mg-go").addEventListener("click", go);
+    mgKey = (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); if (!e.repeat) go(); return true; } return false; };
+  },
+
+  // 사냥: 3x3 칸에 잠깐 나타나는 먹이를 잡기. 가짜(decoy)를 누르면 1점 깎임
+  whack(area, p, done) {
+    area.innerHTML = `
+      <div class="mg-whack">
+        <div class="mg-count">잡은 수 <b id="mg-n">0</b> / ${p.need}</div>
+        <div class="mg-grid">${Array.from({ length: 9 }, (_, i) => `<button class="cell" data-cell="${i}"></button>`).join("")}</div>
+      </div>`;
+    const cells = [...area.querySelectorAll("[data-cell]")];
+    let score = 0;
+    const show = () => {
+      const empty = cells.filter((c) => !c.dataset.kind);
+      if (!empty.length) return;
+      const cell = empty[Math.floor(Math.random() * empty.length)];
+      const kind = p.decoy && Math.random() < 0.25 ? "decoy" : "target";
+      cell.dataset.kind = kind;
+      cell.textContent = kind === "decoy" ? p.decoy : p.target;
+      cell.classList.remove("hit", "miss");
+      cell.classList.add("up");
+      mgTimers.push(setTimeout(() => { delete cell.dataset.kind; cell.textContent = ""; cell.classList.remove("up"); }, p.showMs));
+    };
+    const hit = (cell) => {
+      if (!cell.dataset.kind) return;
+      if (cell.dataset.kind === "target") { score++; cell.classList.add("hit"); }
+      else { score = Math.max(0, score - 1); cell.classList.add("miss"); }
+      delete cell.dataset.kind;
+      document.getElementById("mg-n").textContent = score;
+      if (score >= p.need) done(true);
+    };
+    cells.forEach((c) => c.addEventListener("click", () => hit(c)));
+    mgKey = (e) => { const i = Number(e.key) - 1; if (i >= 0 && i < 9) { e.preventDefault(); hit(cells[i]); return true; } return false; };
+    show();
+    // 10초 동안 진짜 먹이가 목표의 2배쯤 나오도록 자주 띄움 (놓쳐도 만회할 수 있게)
+    mgTimers.push(setInterval(show, Math.max(300, p.showMs * 0.4)));
+    mgTimer(area, p.seconds, () => done(false));
+  },
+
+  // 따라 하기: 보여 준 순서를 똑같이 누르기
+  simon(area, p, done) {
+    area.innerHTML = `
+      <div class="mg-simon">
+        <p class="mg-count" id="mg-say">잘 보세요…</p>
+        <div class="mg-pads">${p.symbols.map((s, i) => `<button class="pad" data-pad="${i}" disabled>${s}<small>${i + 1}</small></button>`).join("")}</div>
+      </div>`;
+    const pads = [...area.querySelectorAll("[data-pad]")];
+    const seq = Array.from({ length: p.length }, () => Math.floor(Math.random() * pads.length));
+    let step = 0;
+    let input = false;
+    seq.forEach((k, i) => {
+      mgTimers.push(setTimeout(() => pads[k].classList.add("lit"), 700 + i * 850));
+      mgTimers.push(setTimeout(() => pads[k].classList.remove("lit"), 700 + i * 850 + 550));
+    });
+    mgTimers.push(setTimeout(() => {
+      input = true;
+      document.getElementById("mg-say").textContent = "이제 따라 하세요!";
+      pads.forEach((b) => (b.disabled = false));
+    }, 700 + seq.length * 850));
+    const press = (k) => {
+      if (!input) return;
+      const b = pads[k];
+      b.classList.add("lit");
+      setTimeout(() => b.classList.remove("lit"), 200);
+      if (k !== seq[step]) { input = false; done(false); return; }
+      step++;
+      document.getElementById("mg-say").textContent = `${step} / ${seq.length}`;
+      if (step >= seq.length) { input = false; done(true); }
+    };
+    pads.forEach((b, k) => b.addEventListener("click", () => press(k)));
+    mgKey = (e) => { const i = Number(e.key) - 1; if (i >= 0 && i < pads.length) { e.preventDefault(); press(i); return true; } return false; };
+  },
+};
 
 // ---------- 4. 결과 화면 ----------
 function renderEnd() {
@@ -638,6 +842,7 @@ function renderSources() {
 // 키보드: 숫자로 선택지, Enter로 주 버튼
 document.addEventListener("keydown", (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (mgKey && mgKey(e)) return;
   const choice = app.querySelector(`[data-i="${Number(e.key) - 1}"]`);
   if (choice) { e.preventDefault(); choice.click(); return; }
   if (e.key === "Enter" && document.activeElement === document.body) {

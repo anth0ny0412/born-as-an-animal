@@ -69,15 +69,19 @@
     const t = animal.timeline[turn];
     const stage = stageAt(animal, turn);
     // seasons·stages·turns·when은 있을 때만 거름 (turns: 여왕 후보의 결혼비행처럼 그 턴에만 나오는 사건)
+    // once: 한 삶에 한 번만 나옴 (미니게임)
     const pool = animal.events.filter(
       (e) =>
         (!e.seasons || e.seasons.includes(t.season)) &&
         (!e.stages || e.stages.includes(stage.id)) &&
         (!e.turns || e.turns.includes(turn)) &&
+        !(e.once && state.seen[e.id]) &&
         flagsMatch(state, e.when)
     );
     if (pool.length === 0) throw new Error(`${animal.name}: ${turn}턴(${t.label}, ${stage.name})에 나올 사건이 없음`);
-    const ev = weightedPick(pool, (e) => e.weight * (state.seen[e.id] ? 0.25 : 1), rng);
+    // force: 조건이 맞으면 다른 사건보다 먼저 나옴 (미니게임이 정해진 시기에 꼭 나오게)
+    const forced = pool.filter((e) => e.force);
+    const ev = weightedPick(forced.length ? forced : pool, (e) => e.weight * (state.seen[e.id] ? 0.25 : 1), rng);
     state.current = ev;
     return { event: ev, time: t, stage };
   }

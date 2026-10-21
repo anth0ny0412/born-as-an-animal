@@ -59,6 +59,7 @@
     else if (kind === "birth") press("start", readTime(info.text, 5000));
     else if (kind === "intro") press("go", readTime(info.text, 2500));
     else if (kind === "outcome") press("next", readTime(info.text, 3000));
+    else if (kind === "minigame") press("mg-skip", readTime(info.text, 3000));
     else if (kind === "turn") {
       const ms = readTime(info.text, 3000);
       countdown(document.querySelector(".event"), ms);

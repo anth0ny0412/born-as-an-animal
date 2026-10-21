@@ -32,6 +32,25 @@ for (const s of ctx.SPECIES) {
   if (!ctx.SOURCES || !ctx.SOURCES[s.id]) fail(`${s.id}: data/sources.js에 출처가 없음`);
 }
 
+// 미니게임: 삶마다 정확히 하나, 그리고 실제로 나오는지 (살아서 그 시기까지 간 삶 기준)
+for (const id of lifeIds) {
+  const life = ctx.ANIMALS[id];
+  const mgs = life.events.filter((e) => e.minigame);
+  if (mgs.length !== 1) { fail(`${id}: 미니게임이 ${mgs.length}개 (1개여야 함)`); continue; }
+  let reached = 0, played = 0;
+  for (let i = 0; i < 2000; i++) {
+    const s = ctx.Engine.startLife(life);
+    while (!s.finished) {
+      const { event } = ctx.Engine.nextEvent(s, Math.random);
+      if (event.minigame) { played++; break; }
+      ctx.Engine.choose(s, Math.floor(Math.random() * event.choices.length), Math.random);
+    }
+    if (s.turn >= Math.min(...mgs[0].turns)) reached++;
+  }
+  if (played === 0) fail(`${id}: 미니게임이 한 번도 나오지 않음`);
+  else if (played < reached * 0.6) fail(`${id}: 미니게임 시기까지 산 삶 중 ${Math.round((played / reached) * 100)}%만 미니게임을 만남`);
+}
+
 // ---------- 2. 경로 ----------
 for (const id of lifeIds) {
   try {
