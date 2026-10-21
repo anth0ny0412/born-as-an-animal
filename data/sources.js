@@ -174,4 +174,90 @@ window.SOURCES = {
       { kind: "연구", label: "젖소 수명과 농장 수익 (PMC)", url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8071937/" },
     ],
   },
+  goral: {
+    calibration: "태어난 첫 겨울을 2023~24년 겨울로 두고, 그 겨울 산양의 절반 가까이가 죽은 기록(약 1,022마리 / 약 2,000마리)에 맞췄어요.",
+    links: [
+      { kind: "보도", label: "산양 1,022마리 폐사 위치 데이터 분석 (YTN)", url: "https://www.ytn.co.kr/_ln/0105_202409021958402314" },
+      { kind: "보도", label: "떼죽음 이후 산양 겨울나기 대책 (YTN)", url: "https://www.ytn.co.kr/_ln/0103_202410231129206325" },
+      { kind: "연구", label: "산양 집단 폐사와 ASF 울타리 보고서 (아름다운재단)", url: "https://beautifulfund.org/wp-content/uploads/2024/12/20250103_071855.pdf" },
+    ],
+  },
+  seal: {
+    calibration: "",
+    links: [
+      { kind: "통계", label: "백령도 점박이물범 5년 주민 모니터링 (인천시)", url: "https://www.incheon.go.kr/susan/SU030201/1822539" },
+      { kind: "보도", label: "점박이물범 개체 수와 번식 (헤럴드경제 2026)", url: "https://www.heraldk.com/article/2026030602400029274" },
+    ],
+  },
+  stork: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "야생 황새 230여 마리, 번식쌍 21쌍 (위키트리, 예산군 발표)", url: "https://www.wikitree.co.kr/articles/1022363" },
+      { kind: "보도", label: "전신주 감전사로 황새 방사 중단 (서울신문 2016)", url: "https://m.go.seoul.co.kr/news/2016/10/06/20161006014009" },
+    ],
+  },
+  otter: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "중랑천 수달 복귀 (서울시 미디어허브)", url: "https://mediahub.seoul.go.kr/archives/2007220" },
+      { kind: "보도", label: "도심 하천 수달과 배설물 속 플라스틱 (위키트리)", url: "https://www.wikitree.co.kr/articles/1047867" },
+    ],
+  },
+  raccoondog: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "서울 도심 너구리 출몰과 구조 증가 (서울연구원 보고서 인용, 세계일보)", url: "https://www.segye.com/newsView/20250428501096" },
+      { kind: "보도", label: "도심 너구리와 공존 가이드라인 (경향신문)", url: "https://www.khan.co.kr/article/202511262103005/" },
+      { kind: "보도", label: "2021년 로드킬 집계 (데일리벳)", url: "https://www.dailyvet.co.kr/news/policy/173451" },
+    ],
+  },
+  toad: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "망월지 새끼 두꺼비 대이동, 생존 0.1% (서울신문 2016)", url: "https://m.go.seoul.co.kr/news/2016/05/11/20160511500169" },
+      { kind: "보도", label: "망월지 새끼 두꺼비 구조 (경향신문 2026)", url: "https://www.khan.co.kr/article/202605262049005/" },
+      { kind: "보도", label: "아중호수 두꺼비 로드킬 대책 (전북일보)", url: "https://www.jjan.kr/articleAmp/20240309580031" },
+    ],
+  },
+  magpie: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "까치 등 새로 인한 정전, 둥지 철거 (YTN 2026)", url: "https://www.ytn.co.kr/_ln/0115_202609060110230888" },
+      { kind: "보도", label: "최다 포획 유해동물은 까치 (서울신문 2010)", url: "https://m.go.seoul.co.kr/news/2010/11/24/20101124012004" },
+    ],
+  },
+  cricket: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "미래 먹거리 곤충산업 침체 (서울신문 2025)", url: "https://m.go.seoul.co.kr/news/2025/05/13/20250513024004" },
+    ],
+  },
+  firefly: {
+    calibration: "",
+    links: [
+      { kind: "연구", label: "반딧불이 서식지와 보전 (국가유산청)", url: "https://www.heritage.go.kr/DATA1/heritage/hub_img/html/cul_1363503220000.html" },
+      { kind: "보도", label: "반딧불이 서식지 개발 위기 (경기일보)", url: "https://www.kyeonggi.com/article/20250615580135" },
+    ],
+  },
+  cicada: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "열대야 말매미 소음 (헤럴드경제 2026)", url: "https://www.heraldk.com/article/2026081202452491851" },
+      { kind: "연구", label: "도시 온도와 매미 밀도 (이화여대 학위논문)", url: "https://dspace.ewha.ac.kr/handle/2015.oak/245803" },
+    ],
+  },
+  slider: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "생태계교란 외래 거북 실태 (경기일보 2023)", url: "https://www.kyeonggi.com/article/20230819580083" },
+      { kind: "연구", label: "국내 외래 거북 유통과 분포 (한국환경생물학회)", url: "https://www.koreascience.kr/article/JAKO201631642280966.pdf" },
+    ],
+  },
+  hamster: {
+    calibration: "",
+    links: [
+      { kind: "보도", label: "사은품·무료 나눔 햄스터와 유기 (노컷뉴스)", url: "https://www.nocutnews.co.kr/news/4825562" },
+      { kind: "보도", label: "팬데믹 충동 구매와 햄스터 유기 (VICE)", url: "https://vice.com/en/article/pandemic-abandoned-pets-hamster-singapore" },
+    ],
+  },
 };
